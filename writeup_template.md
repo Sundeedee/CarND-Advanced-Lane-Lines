@@ -22,10 +22,10 @@ The goals / steps of this project are the following:
 [image1]: ./examples/undistort_output.png "Undistorted"
 [image2]: ./test_images/test1_output.jpg "Road Transformed"
 [image3]: ./test_images/threshold.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image4]: ./test_images/warp_test.jpg "Warp Example"
+[image5]: ./test_images/visual_test.jpg "Fit Visual"
+[image6]: ./test_images/draw_test.jpg "Output"
+[video1]: ./white.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -60,35 +60,35 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at No.5 cell in `Udacity-Advanced-Lane-Finding.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at No.5 cell in `Udacity-Advanced-Lane-Finding.ipynb`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
 ![alt text][image3]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warper()`, which appears in No.3 cell in the file `Udacity-Advanced-Lane-Finding.ipynb`.  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
 ```python
 src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
+    [[565, 460],
+    [265, 700],
+    [1125, 700],
+    [760, 460]])
 dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+    [[240, 0],
+    [320, 720],
+    [960, 720],
+    [1180, 0]])
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 565, 460      | 240, 0        | 
+| 265, 700      | 320, 720      |
+| 1125, 700     | 960, 720      |
+| 760, 460      | 1180, 0        |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
@@ -98,15 +98,16 @@ I verified that my perspective transform was working as expected by drawing the 
 
 Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
 
+In No.6 cell in `Udacity-Advanced-Lane-Finding.ipynb`, I used the histogram method to detect lane line when we didn't detect good lane line in the last iteration. And in No.7 cell in `Udacity-Advanced-Lane-Finding.ipynb`, I used a method to count all the pixels within a specific margin around the previous good lane line as candidates to determine the lane line. For these pixels, I passed their coordinates into the np.polyfit function to get the 2nd order polynomial coefficients.
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I did this in get_curve() function in No.10 cell in `Udacity-Advanced-Lane-Finding.ipynb`. I get the average 2nd order polynomial coordinates and passed them to get_curve() function. In this function, it will transfer the pixel space to meter space based on the parameter provided by Udacity, and we fit new coordinates in a new 2nd order polynomial in meter space then we can easy get the curve from using the formula. For the position of the vehicle with repsect to center, I assume that the middle of the image is where the center of the car, so pass the 720*y_meter_per_pixel into the polynomial and get the position of the lane line. Substract these two values then we can get the position of the vehicle with respect to the two lane lines. 
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in No.8 cell in my code in `Udacity-Advanced-Lane-Finding.ipynb` in the function `draw_lane()`.  Here is an example of my result on a test image:
 
 ![alt text][image6]
 
@@ -116,7 +117,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./white.mp4)
 
 ---
 
@@ -124,4 +125,4 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+First, I simply implemented the method was tought into the course, and in the project video, some frames with shadow or cars near the lane cause the detected lane change their shape. To solve this problem, I first found out it was caused by the car and the edge of the road. So I adjusted the thresholds to remove the affect from unexpected objects, and I also used the average detected lane line pixels to fit the 2nd order polynomial. This also help reduce the affect from unexpected objects. Because the perspective transform is hardcoded, if the car is on a hill or uneven road, the result could be not parallel. Because I was using histogram method to start to detect the lane line, sometimes the edge of the road would be inside the perspective transformed image, this method would consider the edge of the road is the left lane line. To make it more robust, I could search the max two values from middle of the image to two sides of the image and set the position with higher index as search start point.
